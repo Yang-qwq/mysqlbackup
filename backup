@@ -1,0 +1,21 @@
+#!/usr/bin/sh
+
+# 切换到脚本所在的目录
+cd $(cd $(dirname $0);pwd)
+
+current_timestamp=`date '+%s'`
+
+mysqldump --all-databases --lock-all-tables -u $USER > export.sql
+
+git add *
+
+manual_comment=$1
+
+# 判断是否为手动备份
+if [ -z $manual_comment ]; then
+	git commit -m "auto backup ($current_timestamp)"
+else 
+	git commit -m "$manual_comment"
+fi
+
+git push
